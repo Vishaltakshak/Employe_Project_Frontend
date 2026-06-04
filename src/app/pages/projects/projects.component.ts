@@ -2,10 +2,10 @@ import { ChangeDetectorRef, Component, inject, OnInit } from '@angular/core';
 import { NavBarComponent } from '../nav-bar/nav-bar.component';
 import { ProjectService } from "../../services/project.service";
 import { IProject } from "../../Model/ProjectInterface";
-
 import { CommonModule } from '@angular/common';
 import { FormBuilder, FormGroup, ReactiveFormsModule, Validators } from '@angular/forms';
-import { StatsBarComponent, IStatsCard } from '../../components/stats-bar/stats-bar.component';
+import { StatsBarComponent } from '../../components/stats-bar/stats-bar.component';
+import { IStatsCard} from '../../Model/StatsCard';
 
 @Component({
   selector: 'app-projects',
@@ -89,7 +89,6 @@ export class ProjectsComponent implements OnInit {
   onEdit(proj: IProject): void {
     this.isEditMode = true;
     
-
     this.updateForm.patchValue({
       ProjectId: proj.ProjectId,
       ProjectName: proj.ProjectName,

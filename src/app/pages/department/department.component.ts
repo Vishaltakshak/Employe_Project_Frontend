@@ -5,7 +5,8 @@ import { IDepartment } from "../../Model/Departments";
 
 import { CommonModule } from '@angular/common';
 import { FormBuilder, FormGroup, ReactiveFormsModule, Validators } from '@angular/forms';
-import { StatsBarComponent, IStatsCard } from '../../components/stats-bar/stats-bar.component';
+import { StatsBarComponent } from '../../components/stats-bar/stats-bar.component';
+import { IStatsCard} from '../../Model/StatsCard'
 
 @Component({
   selector: 'app-department',
@@ -23,9 +24,6 @@ export class DepartmentComponent implements OnInit {
   updateForm: FormGroup;
   isEditMode = false;
   isSubmitting = false;
-  successMessage = '';
-  errorMessage = '';
-  searchTerm = '';
 
   constructor() {
     this.updateForm = this.fb.group({
@@ -68,15 +66,12 @@ export class DepartmentComponent implements OnInit {
       },
       error: (err) => {
         console.error('Error loading departments:', err);
-        this.errorMessage = 'Failed to load departments. Make sure backend is running.';
       }
     });
   }
 
   onAdd(): void {
     this.isEditMode = false;
-    this.errorMessage = '';
-    this.successMessage = '';
 
     this.updateForm.reset({
       DeptId: 0,
@@ -92,9 +87,6 @@ export class DepartmentComponent implements OnInit {
 
   onEdit(dept: IDepartment): void {
     this.isEditMode = true;
-    this.errorMessage = '';
-    this.successMessage = '';
-
     this.updateForm.patchValue({
       DeptId: dept.DeptId,
       DeptName: dept.DeptName,
@@ -128,16 +120,12 @@ export class DepartmentComponent implements OnInit {
     }
 
     this.isSubmitting = true;
-    this.errorMessage = '';
-    this.successMessage = '';
-    
     const formData = this.updateForm.value as IDepartment;
 
     if (this.isEditMode) {
       this.departmentService.updateDepartment(formData.DeptId, formData).subscribe({
         next: () => {
           this.isSubmitting = false;
-          this.successMessage = 'Department updated successfully!';
           this.loadDepartments();
           this.closeForm();
           
@@ -145,15 +133,12 @@ export class DepartmentComponent implements OnInit {
         error: (err) => {
           console.error('Error updating department:', err);
           this.isSubmitting = false;
-          this.errorMessage = 'Failed to update department. Please check details.';
-          
         }
       });
     } else {
       this.departmentService.createDepartment(formData).subscribe({
         next: () => {
           this.isSubmitting = false;
-          this.successMessage = 'Department created successfully!';
           this.loadDepartments();
           this.closeForm();
           
@@ -161,7 +146,6 @@ export class DepartmentComponent implements OnInit {
         error: (err) => {
           console.error('Error creating department:', err);
           this.isSubmitting = false;
-          this.errorMessage = 'Failed to create department. Please check details.';
           
         }
       });
@@ -172,13 +156,11 @@ export class DepartmentComponent implements OnInit {
     if (confirm('Are you sure you want to delete this department?')) {
       this.departmentService.deleteDepartment(deptId).subscribe({
         next: () => {
-          this.successMessage = 'Department deactivated successfully!';
           this.loadDepartments();
           
         },
         error: (err) => {
           console.error('Error deleting department:', err);
-          this.errorMessage = 'Failed to delete department.';
           
         }
       });

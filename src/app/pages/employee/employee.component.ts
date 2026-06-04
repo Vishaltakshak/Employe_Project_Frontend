@@ -8,7 +8,8 @@ import { IDepartment } from "../../Model/Departments";
 import { IProject } from "../../Model/ProjectInterface";
 
 import { CommonModule } from '@angular/common';
-import { StatsBarComponent, IStatsCard } from '../../components/stats-bar/stats-bar.component';
+import { StatsBarComponent } from '../../components/stats-bar/stats-bar.component';
+import { IStatsCard} from '../../Model/StatsCard'
 import { FormPanelComponent } from './components/form-panel/form-panel.component';
 import { DataTableComponent } from './components/data-table/data-table.component';
 import { ProjectAssignmentPopupComponent } from './components/project-assignment-popup/project-assignment-popup.component';

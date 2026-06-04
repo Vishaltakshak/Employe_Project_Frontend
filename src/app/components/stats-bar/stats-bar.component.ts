@@ -1,10 +1,7 @@
 import { Component, Input } from '@angular/core';
 import { CommonModule } from '@angular/common';
 
-export interface IStatsCard {
-  label: string;
-  value: number | string;
-}
+import { IStatsCard } from '../../Model/StatsCard';  
 
 @Component({
   selector: 'app-stats-bar',
