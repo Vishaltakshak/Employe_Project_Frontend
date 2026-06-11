@@ -1,2 +1,46 @@
 /* You can add global styles to this file, and also import other style files */
+@import "primeng/resources/themes/lara-light-blue/theme.css";
+@import "primeng/resources/primeng.min.css";
+@import "primeicons/primeicons.css";
+@import "ngx-toastr/toastr";
 @import "tailwindcss";
+.custom-confirm-popup {
+    border-radius: 20px !important;
+    border: 1px solid #e2e8f0 !important;
+    box-shadow: 0 20px 40px rgba(15, 23, 42, 0.08) !important;
+}
+
+.custom-confirm-popup .p-confirm-popup-content {
+    padding: 1rem !important;
+    gap: 1rem !important;
+}
+
+
+.custom-confirm-popup .p-confirm-popup-footer {
+    display: flex !important;
+    justify-content: flex-end !important;
+    gap: 2rem !important;
+    padding-left: 20px;
+
+}
+.custom-confirm-popup .p-confirmpopup-reject-button{
+    background-color: red!important;
+}
+
+::-webkit-scrollbar {
+    width: 11px!important;
+}
+
+::-webkit-scrollbar-track {
+    background: #737364!important;
+}
+
+::-webkit-scrollbar-thumb {
+    background: #272727!important;
+    border-radius: 10px!important;
+}
+
+::-webkit-scrollbar-thumb:hover {
+    background: #333b39!important;
+}
+

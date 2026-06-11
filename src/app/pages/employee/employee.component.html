@@ -3,10 +3,9 @@
 
   <div class="max-w-7xl mx-auto px-8 pt-8">
     
-    <!-- Title & Description Header -->
     <div class="mb-8 flex flex-row items-center justify-between gap-4">
       <div>
-        <h1 class="text-4xl font-extrabold bg-gradient-to-r from-slate-900 to-indigo-950 bg-clip-text text-transparent">
+        <h1 class="text-4xl font-extrabold bg-gradient-to-r from-slate-900 to-indigo-950 bg-clip-text text-transparent py-1">
           Employee Management
         </h1>
         <p class="text-sm text-slate-500 mt-1">
@@ -15,10 +14,8 @@
       </div>
     </div>
 
-    <!-- Layout Grid -->
     <div class="grid grid-cols-[380px_1fr] gap-8 mb-8">
       
-      <!-- Side Form Panel -->
       <app-form-panel
         [departments]="departments"
         [isEditMode]="isEditMode"
@@ -28,13 +25,10 @@
         (clear)="onClearForm()"
       ></app-form-panel>
 
-      <!-- Main Display / Table Section -->
       <div class="space-y-6">
 
-        <!-- Stats Counter Bar Component -->
         <app-stats-bar [statsCards]="statsCards"></app-stats-bar>
 
-        <!-- Employees Table Component -->
         <app-data-table
           [employees]="employees"
           [departments]="departments"
@@ -49,7 +43,6 @@
   </div>
 </div>
 
-<!-- Project Assignment Popup Page -->
 <app-project-assignment-popup
   *ngIf="showProjectPopup"
   [employee]="projectEmp"
@@ -59,7 +52,6 @@
   (save)="onSaveProjectAssignments($event)"
 ></app-project-assignment-popup>
 
-<!-- Employee Details Popup Page -->
 <app-details-popup
   *ngIf="showDetailsPopup"
   [employee]="detailsEmp"

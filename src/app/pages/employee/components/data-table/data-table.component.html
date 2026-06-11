@@ -1,7 +1,23 @@
 <div class="bg-white border border-slate-200 rounded-3xl shadow-sm overflow-hidden">
+  <div class="searchbox mt-2 flex justify-center gap-2 py-4 m-4">
+   
+     <div class="relative flex-1">
+      <input
+         type="text"
+         placeholder="Search projects..."
+         class="w-full rounded-2xl border border-slate-200 bg-white pl-10 pr-4 py-2 text-sm text-slate-700 placeholder-slate-400 focus:outline-none focus:border-slate-400 focus:ring-1 focus:ring-slate-500"
+         [(ngModel)]="searchTerm"
+      />
+      <svg class="absolute left-3.5 top-2.5 h-4 w-4 text-slate-400" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+         <path stroke-linecap="round" stroke-linejoin="round" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
+      </svg>
+        
+    </div>
   
+    
+  </div>
   <!-- Empty State -->
-  <div *ngIf="employees.length === 0" class="py-16 px-4 text-center">
+  <div *ngIf="filteredEmployees.length === 0" class="py-16 px-4 text-center">
     <div class="w-16 h-16 bg-slate-50 rounded-full flex items-center justify-center mx-auto mb-4">
       <svg class="h-8 w-8 text-slate-400" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="1.5">
         <path stroke-linecap="round" stroke-linejoin="round" d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0zm6 3a2 2 0 11-4 0 2 2 0 014 0zM7 10a2 2 0 11-4 0 2 2 0 014 0z" />
@@ -14,7 +30,7 @@
   </div>
 
   <!-- Employees Table -->
-  <div *ngIf="employees.length > 0" class="overflow-x-auto">
+  <div *ngIf="filteredEmployees.length > 0" class="overflow-x-auto">
     <table class="w-full text-left border-collapse">
       <thead>
         <tr class="bg-slate-50 border-b border-slate-200">
@@ -27,7 +43,7 @@
         </tr>
       </thead>
       <tbody class="divide-y divide-slate-100">
-        <tr *ngFor="let emp of employees" class="hover:bg-slate-50/40 transition duration-150 group">
+        <tr *ngFor="let emp of filteredEmployees | slice:first:(first + rows)" class="hover:bg-slate-50/40 transition duration-150 group">
           
           <td class="p-4 pl-6">
             <div class="flex items-center gap-3">
@@ -100,7 +116,7 @@
 
               <!-- Delete -->
               <button 
-                (click)="delete.emit(emp.EmpId)"
+                (click)="onDeleteClick($event, emp.EmpId)"
                 title="Delete employee"
                 class="p-2 rounded-xl text-slate-400 hover:text-rose-600 hover:bg-rose-50 active:scale-95 transition duration-150"
               >
@@ -113,5 +129,13 @@
         </tr>
       </tbody>
     </table>
+    <p-paginator 
+      [rows]="rows" 
+      [totalRecords]="totalRecords" 
+     
+      (onPageChange)="onPageChange( $event)"
+      styleClass="p-paginator-bottom" />
   </div>
 </div>
+
+<p-confirmPopup styleClass=" p-6 custom-confirm-popup"></p-confirmPopup>

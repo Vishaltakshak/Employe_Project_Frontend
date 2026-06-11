@@ -4,14 +4,18 @@ import { DepartmentService } from "../../services/department.service";
 import { IDepartment } from "../../Model/Departments";
 
 import { CommonModule } from '@angular/common';
-import { FormBuilder, FormGroup, ReactiveFormsModule, Validators } from '@angular/forms';
+import { FormBuilder, FormGroup, FormsModule, ReactiveFormsModule, Validators } from '@angular/forms';
 import { StatsBarComponent } from '../../components/stats-bar/stats-bar.component';
-import { IStatsCard} from '../../Model/StatsCard'
+import { IStatsCard} from '../../Model/StatsCard';
+import { PaginatorModule } from 'primeng/paginator';
+import { ConfirmPopupModule } from 'primeng/confirmpopup';
+import { ConfirmationService } from 'primeng/api';
+import { ToastrService } from 'ngx-toastr';
 
 @Component({
   selector: 'app-department',
   standalone: true,
-  imports: [NavBarComponent, CommonModule, ReactiveFormsModule, StatsBarComponent],
+  imports: [NavBarComponent, CommonModule, ReactiveFormsModule, FormsModule, StatsBarComponent, PaginatorModule, ConfirmPopupModule],
   templateUrl: './department.component.html',
   styleUrl: './department.component.css'
 })
@@ -19,11 +23,38 @@ export class DepartmentComponent implements OnInit {
   private readonly departmentService = inject(DepartmentService);
   private fb = inject(FormBuilder);
   private cd = inject(ChangeDetectorRef);
+  private toastr = inject(ToastrService);
+  private confirmationService = inject(ConfirmationService);
   
   departments: IDepartment[] = [];
   updateForm: FormGroup;
   isEditMode = false;
   isSubmitting = false;
+
+  rows = 5;
+  first = 0;
+  private _searchTerm: string = "";
+
+  get searchTerm(): string {
+    return this._searchTerm;
+  }
+  set searchTerm(val: string) {
+    this._searchTerm = val;
+    this.first = 0;
+  }
+
+  get filteredDepartments(): IDepartment[] {
+    const term = this.searchTerm.trim().toLowerCase();
+    if (!term) return this.departments;
+    return this.departments.filter(dept => 
+      dept.DeptName.toLowerCase().includes(term) ||
+      (dept.Description && dept.Description.toLowerCase().includes(term))
+    );
+  }
+
+  get totalRecords(): number {
+    return this.filteredDepartments.length;
+  }
 
   constructor() {
     this.updateForm = this.fb.group({
@@ -128,11 +159,12 @@ export class DepartmentComponent implements OnInit {
           this.isSubmitting = false;
           this.loadDepartments();
           this.closeForm();
-          
+          this.toastr.success('Department updated successfully');
         },
         error: (err) => {
           console.error('Error updating department:', err);
           this.isSubmitting = false;
+          this.toastr.error('Failed to update department');
         }
       });
     } else {
@@ -141,29 +173,34 @@ export class DepartmentComponent implements OnInit {
           this.isSubmitting = false;
           this.loadDepartments();
           this.closeForm();
-          
+          this.toastr.success('Department created successfully');
         },
         error: (err) => {
           console.error('Error creating department:', err);
           this.isSubmitting = false;
-          
+          this.toastr.error('Failed to create department');
         }
       });
     }
   }
 
-  onDelete(deptId: number): void {
-    if (confirm('Are you sure you want to delete this department?')) {
-      this.departmentService.deleteDepartment(deptId).subscribe({
-        next: () => {
-          this.loadDepartments();
-          
-        },
-        error: (err) => {
-          console.error('Error deleting department:', err);
-          
-        }
-      });
-    }
+  onDelete(event: Event, deptId: number): void {
+    this.confirmationService.confirm({
+      target: event.target as HTMLElement,
+      message: 'Are you sure you want to delete this department?',
+      icon: 'pi pi-exclamation-triangle',
+      accept: () => {
+        this.departmentService.deleteDepartment(deptId).subscribe({
+          next: () => {
+            this.loadDepartments();
+            this.toastr.success('Department deleted successfully');
+          },
+          error: (err) => {
+            console.error('Error deleting department:', err);
+            this.toastr.error('Failed to delete department');
+          }
+        });
+      }
+    });
   }
 }

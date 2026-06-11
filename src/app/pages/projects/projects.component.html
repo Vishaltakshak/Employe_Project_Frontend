@@ -19,7 +19,7 @@
     <div class="grid grid-cols-[380px_1fr] gap-8 mb-8">
       
       <!-- Side Form Panel -->
-      <div class="bg-white/95 border border-slate-200 rounded-3xl shadow-lg p-6 h-fit">
+      <div class="bg-white/95 border border-slate-200 rounded-3xl shadow-lg p-6 h-fit sticky top-4">
         <h2 class="text-xl font-bold text-slate-900 mb-4">{{ isEditMode ? 'Update Project' : 'Add New Project' }}</h2>
         <form [formGroup]="updateForm" (ngSubmit)="onSubmit()" class="space-y-4">
           <div>
@@ -74,8 +74,23 @@
         <!-- Main Table Container -->
         <div class="bg-white border border-slate-200 rounded-3xl shadow-sm overflow-hidden">
           
+          <!-- Search Box -->
+          <div class="flex items-center gap-2 p-4 bg-slate-50/50 border-b border-slate-200/60">
+            <div class="relative flex-1">
+              <input
+                type="text"
+                placeholder="Search projects..."
+                class="w-full rounded-2xl border border-slate-200 bg-white pl-10 pr-4 py-2 text-sm text-slate-700 placeholder-slate-400 focus:outline-none focus:border-slate-500 focus:ring-1 focus:ring-slate-500"
+                [(ngModel)]="searchTerm"
+              />
+              <svg class="absolute left-3.5 top-2.5 h-4 w-4 text-slate-400" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+                <path stroke-linecap="round" stroke-linejoin="round" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
+              </svg>
+            </div>
+          </div>
+
           <!-- Empty State -->
-          <div *ngIf="projects.length === 0" class="py-16 px-4 text-center">
+          <div *ngIf="filteredProjects.length === 0" class="py-16 px-4 text-center">
             <div class="w-16 h-16 bg-slate-50 rounded-full flex items-center justify-center mx-auto mb-4">
               <svg class="h-8 w-8 text-slate-400" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="1.5">
                 <path stroke-linecap="round" stroke-linejoin="round" d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2m-6 9l2 2 4-4" />
@@ -88,7 +103,7 @@
           </div>
 
           <!-- Projects Table -->
-          <div *ngIf="projects.length > 0" class="overflow-x-auto">
+          <div *ngIf="filteredProjects.length > 0" class="overflow-x-auto">
             <table class="w-full text-left border-collapse">
               <thead>
                 <tr class="bg-slate-50 border-b border-slate-200">
@@ -99,7 +114,7 @@
                 </tr>
               </thead>
               <tbody class="divide-y divide-slate-100">
-                <tr *ngFor="let proj of projects" class="hover:bg-slate-50/40 transition duration-150 group">
+                <tr *ngFor="let proj of filteredProjects | slice:first:(first + rows)" class="hover:bg-slate-50/40 transition duration-150 group">
                   
                   <td class="p-4 pl-6 font-bold text-slate-800">
                     {{ proj.ProjectName }}
@@ -111,7 +126,7 @@
                   
                   <td class="p-4">
                     <div 
-                     
+                      (click)="onDelete($event, proj.ProjectId)"
                       [ngClass]="proj.IsActive ? 'bg-emerald-50 text-emerald-700 border-emerald-100 hover:bg-emerald-100/70' : 'bg-rose-50 text-rose-700 border-rose-100 hover:bg-rose-100/70'"
                       class="cursor-pointer select-none px-2.5 py-0.5 rounded-full text-xs font-bold inline-flex items-center gap-1.5 border transition duration-150"
                     >
@@ -136,7 +151,7 @@
 
                       <!-- Delete -->
                       <button 
-                        (click)="onDelete(proj.ProjectId)"
+                        (click)="onDelete($event, proj.ProjectId)"
                         title="Delete project"
                         class="p-2 rounded-xl text-slate-400 hover:text-rose-600 hover:bg-rose-50 active:scale-95 transition duration-150"
                       >
@@ -149,9 +164,15 @@
                 </tr>
               </tbody>
             </table>
+            <p-paginator 
+              [rows]="rows" 
+              [totalRecords]="totalRecords" 
+              (onPageChange)="first = $event.first ?? 0; rows = $event.rows ?? 5"
+              styleClass="p-paginator-bottom" />
           </div>
         </div>
       </div>
     </div>
   </div>
 </div>
+<p-confirmPopup></p-confirmPopup>

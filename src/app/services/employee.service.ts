@@ -3,6 +3,7 @@ import { HttpClient } from '@angular/common/http';
 import {inject} from '@angular/core';
 import { environment} from '../../environment'
 import { IEmployee} from '../Model/EmployeeInterface'
+import { Observable } from 'rxjs';
 @Injectable({
   providedIn: 'root'
 })
@@ -21,8 +22,11 @@ export class EmployeeService {
   getById(id: number){
     return this.http.get(`${environment.bareUrl}/employee/getbyid/${id}`);
   }
-  getAllEmployees(){
-    return this.http.get(`${environment.bareUrl}/employee/getall`);
+  getAllEmployees(pageNo: number | null = null): Observable<any> {
+    const url = pageNo 
+      ? `${environment.bareUrl}/employee/getall/${pageNo}`
+      : `${environment.bareUrl}/employee/getall`;
+    return this.http.get(url);
   }
   assignProject(employeeId: number, projectId: number, createdBy: string)
   {

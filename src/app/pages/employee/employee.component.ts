@@ -6,6 +6,7 @@ import { ProjectService } from "../../services/project.service";
 import { IEmployee } from "../../Model/EmployeeInterface";
 import { IDepartment } from "../../Model/Departments";
 import { IProject } from "../../Model/ProjectInterface";
+import { ToastrService } from 'ngx-toastr';
 
 import { CommonModule } from '@angular/common';
 import { StatsBarComponent } from '../../components/stats-bar/stats-bar.component';
@@ -19,13 +20,7 @@ import { DetailsPopupComponent } from './components/details-popup/details-popup.
   selector: 'app-employee',
   standalone: true,
   imports: [
-    NavBarComponent,
-    CommonModule,
-    StatsBarComponent,
-    FormPanelComponent,
-    DataTableComponent,
-    ProjectAssignmentPopupComponent,
-    DetailsPopupComponent
+    NavBarComponent,CommonModule,StatsBarComponent,FormPanelComponent,DataTableComponent,ProjectAssignmentPopupComponent,DetailsPopupComponent
   ],
   templateUrl: './employee.component.html'
 })
@@ -34,17 +29,16 @@ export class EmployeeComponent implements OnInit {
   private readonly departmentService = inject(DepartmentService);
   private readonly projectService = inject(ProjectService);
   private cd = inject(ChangeDetectorRef);
+  private toastr = inject(ToastrService);
 
   employees: IEmployee[] = [];
   departments: IDepartment[] = [];
   allProjects: IProject[] = [];
 
-  // Form StateS
   isEditMode = false;
   employeeToEdit: IEmployee | null = null;
   isSubmitting = false;
 
-  // Popups State
   showProjectPopup = false;
   projectEmp: IEmployee | null = null;
   assignedProjects: any[] = [];
@@ -55,9 +49,9 @@ export class EmployeeComponent implements OnInit {
 
   get statsCards(): IStatsCard[] {
     return [
-      { label: 'Total Staff', value: this.employees.length },
-      { label: 'Active Staff', value: this.employees.filter(emp => emp.IsActive).length },
-      { label: 'Inactive Staff', value: this.employees.filter(emp => !emp.IsActive).length },
+      { label: 'Total Employees', value: this.employees.length },
+      { label: 'Active Employees', value: this.employees.filter(emp => emp.IsActive).length },
+      { label: 'Inactive Employees', value: this.employees.filter(emp => !emp.IsActive).length },
       { label: 'Departments', value: this.departments.length }
     ];
   }
@@ -68,8 +62,8 @@ export class EmployeeComponent implements OnInit {
     this.loadAllProjects();
   }
 
-  loadEmployees(): void {
-    this.employeeService.getAllEmployees().subscribe({
+  loadEmployees(pageNo: number | null = null): void {
+    this.employeeService.getAllEmployees(pageNo).subscribe({
       next: (data: any) => { this.employees = data; this.cd.detectChanges(); },
       error: (err) => console.error('Error loading employees:', err)
     });
@@ -112,12 +106,14 @@ export class EmployeeComponent implements OnInit {
 
     call.subscribe({
       next: () => {
+        this.toastr.success(this.isEditMode ? 'Employee updated successfully' : 'Employee created successfully');
         this.isSubmitting = false;
         this.loadEmployees();
         this.onClearForm();
       },
       error: (err) => {
         console.error('Error saving employee:', err);
+        this.toastr.error('Failed to save employee');
         this.isSubmitting = false;
       }
     });
@@ -134,12 +130,16 @@ export class EmployeeComponent implements OnInit {
   }
 
   onDeleteEmployee(empId: number): void {
-    if (confirm('Are you sure you want to delete/deactivate this employee?')) {
-      this.employeeService.deleteEmployee(empId).subscribe({
-        next: () => this.loadEmployees(),
-        error: (err) => console.error('Error deleting employee:', err)
-      });
-    }
+    this.employeeService.deleteEmployee(empId).subscribe({
+      next: () => {
+        this.loadEmployees();
+        this.toastr.success('Employee deleted successfully');
+      },
+      error: (err) => {
+        console.error('Error deleting employee:', err);
+        this.toastr.error('Failed to delete employee');
+      }
+    });
   }
 
 
@@ -171,18 +171,31 @@ export class EmployeeComponent implements OnInit {
     }
 
     let completed = 0;
+    let hasError = false;
     const total = toAssign.length + toRemove.length;
-    const finalize = () => {
+    const finalize = (success: boolean) => {
+      if (!success) hasError = true;
       completed++;
       if (completed === total) {
         this.isSubmitting = false;
         this.onCloseProjectPopup();
         this.loadEmployees();
+        if (hasError) {
+          this.toastr.warning('Some project assignments failed to update');
+        } else {
+          this.toastr.success('Project assignments updated successfully');
+        }
       }
     };
 
-    toAssign.forEach(id => this.employeeService.assignProject(empId, id, 'Admin').subscribe({ next: finalize, error: finalize }));
-    toRemove.forEach(id => this.employeeService.removeFromProject(empId, id, 'Admin').subscribe({ next: finalize, error: finalize }));
+    toAssign.forEach(id => this.employeeService.assignProject(empId, id, 'Admin').subscribe({ 
+      next: () => finalize(true), 
+      error: () => finalize(false) 
+    }));
+    toRemove.forEach(id => this.employeeService.removeFromProject(empId, id, 'Admin').subscribe({ 
+      next: () => finalize(true), 
+      error: () => finalize(false) 
+    }));
   }
 
   onCloseProjectPopup(): void {

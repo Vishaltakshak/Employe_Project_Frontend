@@ -1,4 +1,4 @@
-<div class="bg-white/95 border border-slate-200 rounded-3xl shadow-lg p-6 h-fit">
+<div class="bg-white/95 border border-slate-200 rounded-3xl shadow-lg p-6 h-fit sticky top-4">
   <h2 class="text-xl font-bold text-slate-900 mb-4">{{ isEditMode ? 'Update Employee' : 'Add New Employee' }}</h2>
   <form [formGroup]="updateForm" (ngSubmit)="onSubmit()" class="space-y-4">
     <div>
