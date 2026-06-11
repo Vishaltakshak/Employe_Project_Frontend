@@ -86,6 +86,7 @@
               <button 
                 (click)="assignProject.emit(emp)"
                 title="Assign Project"
+                [ngClass]="emp.IsActive ? 'display-block' : 'hidden' "
                 class="px-2.5 py-1 text-xs font-bold border border-indigo-200 rounded-xl text-indigo-700 bg-indigo-50 hover:bg-indigo-100 transition duration-150"
               >
                 Assign Project

@@ -3,6 +3,7 @@ import { FormBuilder, FormGroup, ReactiveFormsModule, Validators } from '@angula
 import { CommonModule } from '@angular/common';
 import { IDepartment } from "../../../../Model/Departments";
 import { IEmployee } from "../../../../Model/EmployeeInterface";
+import { noWhitespaceValidator } from '../../../../utilities/whiteSpaceValidator';
 
 @Component({
   selector: 'app-form-panel',
@@ -19,12 +20,11 @@ export class FormPanelComponent implements OnChanges {
   @Output() save = new EventEmitter<any>();
   @Output() clear = new EventEmitter<void>();
 
-  updateForm: FormGroup;
-
+  today = new Date().toISOString().split('T')[0];  updateForm: FormGroup;
   constructor(private fb: FormBuilder) {
     this.updateForm = this.fb.group({
       EmpId: [0],
-      EmpName: ['', [Validators.required, Validators.minLength(2)]],
+      EmpName: ['', [Validators.required, Validators.minLength(2), noWhitespaceValidator]],
       EmpEmail: ['', [Validators.required, Validators.email]],
       EmpAge: ['', [Validators.required, Validators.min(18), Validators.max(100)]],
       DateOfJoining: ['', Validators.required],

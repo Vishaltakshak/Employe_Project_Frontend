@@ -113,7 +113,7 @@ export class EmployeeComponent implements OnInit {
       },
       error: (err) => {
         console.error('Error saving employee:', err);
-        this.toastr.error('Failed to save employee');
+        this.toastr.error('Failed to save employee', err.error.Message);
         this.isSubmitting = false;
       }
     });

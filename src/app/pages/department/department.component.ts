@@ -11,6 +11,7 @@ import { PaginatorModule } from 'primeng/paginator';
 import { ConfirmPopupModule } from 'primeng/confirmpopup';
 import { ConfirmationService } from 'primeng/api';
 import { ToastrService } from 'ngx-toastr';
+import { noWhitespaceValidator } from '../../utilities/whiteSpaceValidator';
 
 @Component({
   selector: 'app-department',
@@ -59,8 +60,8 @@ export class DepartmentComponent implements OnInit {
   constructor() {
     this.updateForm = this.fb.group({
       DeptId: [0],
-      DeptName: ['', [Validators.required, Validators.minLength(2)]],
-      Description: [''],
+      DeptName: ['', [Validators.required, Validators.minLength(2), noWhitespaceValidator]],
+      Description: ['', Validators.required, Validators.minLength(10), noWhitespaceValidator],
       IsActive: [true],
       CreateBy: ['Admin'],
       CreateDate: [null],
